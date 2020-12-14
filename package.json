@@ -11,6 +11,9 @@
     "@oclif/command": "^1",
     "@oclif/config": "^1",
     "@oclif/plugin-help": "^3",
+    "@types/inquirer": "^7.3.1",
+    "inquirer": "^7.3.3",
+    "inquirer-search-list": "^1.2.6",
     "tslib": "^1"
   },
   "devDependencies": {
