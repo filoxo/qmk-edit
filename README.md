@@ -1,5 +1,4 @@
-qmk-edit
-========
+# qmk-edit
 
 Edit QMK code directly
 
@@ -9,27 +8,28 @@ Edit QMK code directly
 [![License](https://img.shields.io/npm/l/qmk-edit.svg)](https://github.com/filoxo/qmk-edit/blob/master/package.json)
 
 <!-- toc -->
-* [Usage](#usage)
-* [Commands](#commands)
+
+- [Usage](#usage)
+- [Commands](#commands)
 <!-- tocstop -->
+
 # Usage
+
 <!-- usage -->
+
 ```sh-session
-$ npm install -g qmk-edit
-$ qmk-edit COMMAND
-running command...
-$ qmk-edit (-v|--version|version)
-qmk-edit/0.0.0 darwin-x64 node-v12.8.1
-$ qmk-edit --help [COMMAND]
-USAGE
-  $ qmk-edit COMMAND
-...
+npx qmk-edit
+
 ```
+
 <!-- usagestop -->
+
 # Commands
+
 <!-- commands -->
-* [`qmk-edit hello [FILE]`](#qmk-edit-hello-file)
-* [`qmk-edit help [COMMAND]`](#qmk-edit-help-command)
+
+- `qmk-edit config [KEYBOARD_NAME/KEYMAP]`
+- `qmk-edit features [KEYBOARD_NAME/KEYMAP]`
 
 ## `qmk-edit hello [FILE]`
 
@@ -67,4 +67,5 @@ OPTIONS
 ```
 
 _See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.2.0/src/commands/help.ts)_
+
 <!-- commandsstop -->
