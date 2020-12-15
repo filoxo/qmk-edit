@@ -1,5 +1,5 @@
 import { Command, flags } from "@oclif/command";
-
+// https://docs.qmk.fm/#/config_options
 export default class Config extends Command {
   static description = "Edit config.h values";
 
