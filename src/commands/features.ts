@@ -2,6 +2,42 @@ import { Command } from "@oclif/command";
 import { getPaths, getFileContents } from "../utils";
 import prompt from "../prompt";
 
+// https://docs.qmk.fm/#/config_options?id=the-rulesmk-file
+// https://docs.qmk.fm/#/config_options?id=feature-options
+// https://docs.qmk.fm/#/getting_started_make_guide?id=rulesmk-options
+
+const SUPPORTED_FEATURES = {
+  // API_SYSEX_ENABLE: ["no", "yes"],
+  AUDIO_ENABLE: ["no", "yes"],
+  BACKLIGHT_ENABLE: ["no", "yes"],
+  BLUETOOTH: ["no", "yes"],
+  BOOTMAGIC_ENABLE: ["no", "lite", "full"],
+  COMBO_ENABLE: ["no", "yes"],
+  COMMAND_ENABLE: ["no", "yes"],
+  CONSOLE_ENABLE: ["no", "yes"],
+  CUSTOM_MATRIX: ["no", "yes"],
+  DEBOUNCE_TYPE: ["no", "yes"],
+  EXTRAKEY_ENABLE: ["no", "yes"],
+  FAUXCLICKY_ENABLE: ["no", "yes"],
+  KEY_LOCK_ENABLE: ["no", "yes"],
+  LEADER_ENABLE: ["no", "yes"],
+  MIDI_ENABLE: ["no", "yes"],
+  MOUSEKEY_ENABLE: ["no", "yes"],
+  NKRO_ENABLE: ["no", "yes"],
+  NO_USB_STARTUP_CHECK: ["no", "yes"],
+  RGBLIGHT_ENABLE: ["no", "yes"],
+  SLEEP_LED_ENABLE: ["no", "yes"],
+  SPLIT_KEYBOARD: ["no", "yes"],
+  // SPLIT_TRANSPORT: ["no", "yes"],  
+  STENO_ENABLE: ["no", "yes"],
+  // UCIS_ENABLE: ["no", "yes"],
+  UNICODE_ENABLE: ["no", "yes"],
+  UNICODEMAP_ENABLE: ["no", "yes"],
+  // VARIABLE_TRACE: ["no", "yes"],
+  VELOCIKEY_ENABLE: ["no", "yes"],
+  WAIT_FOR_USB: ["no", "yes"],
+};
+
 export default class Features extends Command {
   static description = "Edit features and their options";
 
@@ -20,51 +56,55 @@ export default class Features extends Command {
   ];
 
   async run() {
-    const { args } = this.parse(Features);
-    const [keyboard, keymap] = args.keyboard;
+    const [keyboard, keymap] = this.parse(Features).args.keyboard;
     const paths = await getPaths(keyboard, keymap);
-    const features = await this._getFeatures(
-      paths["keyboard/rules.mk"],
-      paths["keymap/rules.mk"]
-    );
-
-    const response = await prompt([
+    const keyboardFeatures = await this.parseFeatures(paths["keyboard/rules.mk"]);
+    const keymapFeatures = await this.parseFeatures(paths["keymap/rules.mk"]);
+    const featuresPrompts = this.createSupportedFeaturesPrompts({
+      ...keyboardFeatures,
+      ...keymapFeatures,
+    });
+    const changes = await prompt([
       {
         type: "search-list",
         message: "Select a feature to modify",
         name: "feature",
-        choices: Object.keys(features),
+        choices: Object.keys(SUPPORTED_FEATURES),
         required: true,
       },
-      {
-        type: "list",
-        message: "Edit BOOTMAGIC_ENABLE",
-        name: "BOOTMAGIC_ENABLE",
-        default: features["BOOTMAGIC_ENABLE"],
-        choices: ["no", "lite", "full"],
-        when: (answers) => answers.feature === "BOOTMAGIC_ENABLE",
-      },
-      {
-        type: "list",
-        message: "Edit MOUSEKEY_ENABLE",
-        name: "MOUSEKEY_ENABLE",
-        default: features["MOUSEKEY_ENABLE"],
-        choices: ["no", "yes"],
-        when: (answers) => answers.feature === "MOUSEKEY_ENABLE",
-      },
+      ...featuresPrompts,
     ]);
 
-    console.log(response);
+    console.log(changes);
   }
 
-  async _getFeatures(keyboardRules, keymapRules) {
-    keyboardRules = await getFileContents(keyboardRules);
-    // keymapRules = await getFileContents(keymapRules);
-    const parsedKeyboardRules = keyboardRules
+  async parseFeatures(file) {
+    const contents = await getFileContents(file);
+    if (!contents) return;
+    const features = contents
       .split("\n")
-      .map((r) => r.split("#")[0].replace(/\s+/g, "")) // remove C comments
+      .map(
+        (r) =>
+          r
+            .split("#")[0] // remove C comments
+            .replace(/\s+/g, "") // remove extra whitespace
+      )
       .filter(Boolean)
       .map((r) => r.split("="));
-    return Object.fromEntries(parsedKeyboardRules);
+    return Object.fromEntries(features);
+  }
+
+  createSupportedFeaturesPrompts(features) {
+    const prompts = Object.entries(SUPPORTED_FEATURES).map(
+      ([featureName, choices]) => ({
+        type: "list",
+        message: `Edit ${featureName}`,
+        name: featureName,
+        default: features[featureName],
+        choices,
+        when: (answers) => answers.feature === featureName,
+      })
+    );
+    return prompts;
   }
 }
