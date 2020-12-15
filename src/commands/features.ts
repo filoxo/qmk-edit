@@ -1,5 +1,5 @@
 import { Command } from "@oclif/command";
-import { getPaths, getFileContents } from "../utils";
+import { getPaths, getQmkFile } from "../utils";
 import prompt from "../prompt";
 
 // https://docs.qmk.fm/#/config_options?id=the-rulesmk-file
@@ -79,19 +79,8 @@ export default class Features extends Command {
   }
 
   async parseFeatures(file) {
-    const contents = await getFileContents(file);
-    if (!contents) return;
-    const features = contents
-      .split("\n")
-      .map(
-        (r) =>
-          r
-            .split("#")[0] // remove C comments
-            .replace(/\s+/g, "") // remove extra whitespace
-      )
-      .filter(Boolean)
-      .map((r) => r.split("="));
-    return Object.fromEntries(features);
+    const features = await getQmkFile(file);
+    return Object.fromEntries(features.map((r) => r.split("=")));
   }
 
   createSupportedFeaturesPrompts(features) {

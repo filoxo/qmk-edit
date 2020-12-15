@@ -35,6 +35,14 @@ export async function getPaths(keyboard: string, keymap: string) {
   return filePaths;
 }
 
-export async function getFileContents(path: string) {
-  return path ? fs.readFile(path, "utf8") : null;
+export async function getQmkFile(path: string) {
+  const contents = await fs.readFile(path, "utf8")
+  return contents.split("\n")
+  .map(
+    (r) =>
+      r
+        .split("#")[0] // remove C comments
+        .replace(/\s+/g, "") // remove extra whitespace
+  )
+  .filter(Boolean) 
 }
