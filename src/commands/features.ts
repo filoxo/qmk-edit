@@ -1,5 +1,5 @@
 import { Command } from "@oclif/command";
-import { getPaths, getQmkFile } from "../qmkFileUtils";
+import { setCurrentWorkingBoard, getQmkFeatures, setQmkFeatures } from "../qmkFileUtils";
 import prompt from "../prompt";
 import * as pickBy from 'lodash.pickby';
 
@@ -54,14 +54,8 @@ export default class Features extends Command {
 
   async run() {
     const [keyboard, keymap = "default"] = this.parse(Features).args.keyboard.split(":");
-    const paths = await getPaths(keyboard, keymap);
-    const keyboardFeatures = await this.parseFeatures(paths["keyboard/rules.mk"]);
-    const keymapFeatures = await this.parseFeatures(paths["keymap/rules.mk"]);
-    const currentFeatures = {
-        ...keyboardFeatures,
-        ...keymapFeatures,
-      }
-
+    setCurrentWorkingBoard(keyboard, keymap)
+    const currentFeatures = await getQmkFeatures()
     const {changes} = await prompt([
       {
         type: 'multi-choice',
@@ -77,13 +71,6 @@ export default class Features extends Command {
       }
     ])
     const changesToApply = pickBy(changes, (v, k) => v !== undefined && currentFeatures[k] !== v);
-    
-    console.log(changesToApply);
-  }
-
-  async parseFeatures(file: string): Promise<{[key: string]: string}> {
-    if(!file) return Promise.resolve({})
-    const features = await getQmkFile(file);
-    return Object.fromEntries(features.map((r) => r.split("=")));
+    setQmkFeatures(changesToApply)
   }
 }
