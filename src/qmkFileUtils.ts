@@ -87,6 +87,7 @@ export async function getQmkFeatures(): Promise<{ [key: string]: string }> {
 export async function setQmkFeatures(updatedFeatures: {
   [key: string]: string;
 }) {
+  /* TODO: also handle modifying rev directories */
   // reading them again in case they changed since the cli started
   // these need to be separate in order to distinguish which file to write to
   const keyboardFeatures = await getFeatures(QmkFile.KeyboardRulesMk);
