@@ -48,15 +48,11 @@ export default class Features extends Command {
       name: "keyboard",
       required: false,
       description: "output file",
-      parse: (input: string) => {
-        const [keyboard, keymap = "default"] = input.split(":");
-        return [keyboard, keymap];
-      },
     },
   ];
 
   async run() {
-    const [keyboard, keymap] = this.parse(Features).args.keyboard;
+    const [keyboard, keymap = "default"] = this.parse(Features).args.keyboard.split(":");
     const paths = await getPaths(keyboard, keymap);
     const keyboardFeatures = await this.parseFeatures(paths["keyboard/rules.mk"]);
     const keymapFeatures = await this.parseFeatures(paths["keymap/rules.mk"]);
