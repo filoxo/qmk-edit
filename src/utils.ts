@@ -9,14 +9,14 @@ async function fileExists(file: string) {
   return result;
 }
 
-async function resolveFilePath(fileName: string, filePath: string) {
+async function resolveFilePath(fileName: string, filePath: string): Promise<{[key: string]: string | null}> {
   const exists = await fileExists(filePath);
   return {
     [fileName]: exists ? filePath : null,
   };
 }
 
-export async function getPaths(keyboard: string, keymap: string) {
+export async function getPaths(keyboard: string, keymap: string): Promise<[string, string?][]> {
   const ROOT = "../qmk_firmware/keyboards"; // TODO: make configurable
   const keyboardPath = join(ROOT, keyboard);
   const keymapPath = join(keyboardPath, "keymaps", keymap);
