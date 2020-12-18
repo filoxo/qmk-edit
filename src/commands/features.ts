@@ -1,6 +1,7 @@
 import { Command } from "@oclif/command";
 import { getPaths, getQmkFile } from "../utils";
 import prompt from "../prompt";
+import * as pickBy from 'lodash.pickby';
 
 // https://docs.qmk.fm/#/config_options?id=the-rulesmk-file
 // https://docs.qmk.fm/#/config_options?id=feature-options
@@ -56,22 +57,28 @@ export default class Features extends Command {
     const paths = await getPaths(keyboard, keymap);
     const keyboardFeatures = await this.parseFeatures(paths["keyboard/rules.mk"]);
     const keymapFeatures = await this.parseFeatures(paths["keymap/rules.mk"]);
-    const featuresPrompts = this.createSupportedFeaturesPrompts({
-      ...keyboardFeatures,
-      ...keymapFeatures,
-    });
-    const changes = await prompt([
-      {
-        type: "search-list",
-        message: "Select a feature to modify",
-        name: "feature",
-        choices: Object.keys(SUPPORTED_FEATURES),
-        required: true,
-      },
-      ...featuresPrompts,
-    ]);
+    const currentFeatures = {
+        ...keyboardFeatures,
+        ...keymapFeatures,
+      }
 
-    console.log(changes);
+    const {changes} = await prompt([
+      {
+        type: 'multi-choice',
+        name: 'changes',
+        message: 'Change features settings',
+        rows: Object.entries(SUPPORTED_FEATURES).map(
+          ([featureName, choices]) => ({
+            name: featureName,
+            default: currentFeatures[featureName],
+            choices,
+          })
+        )
+      }
+    ])
+    const changesToApply = pickBy(changes, (v, k) => v !== undefined && currentFeatures[k] !== v);
+    
+    console.log(changesToApply);
   }
 
   async parseFeatures(file: string): Promise<{[key: string]: string}> {
