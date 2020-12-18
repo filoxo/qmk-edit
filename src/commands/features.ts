@@ -48,7 +48,6 @@ export default class Features extends Command {
     {
       name: "keyboard",
       required: false,
-      description: "output file",
     },
   ];
 
