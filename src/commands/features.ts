@@ -71,6 +71,7 @@ export default class Features extends Command {
       }
     ])
     const changesToApply = pickBy(changes, (v, k) => v !== undefined && currentFeatures[k] !== v);
-    setQmkFeatures(changesToApply)
+    await setQmkFeatures(changesToApply)
+    console.log('\nRules updated! ✨⌨️')
   }
 }
