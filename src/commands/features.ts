@@ -74,7 +74,8 @@ export default class Features extends Command {
     console.log(changes);
   }
 
-  async parseFeatures(file) {
+  async parseFeatures(file: string): Promise<{[key: string]: string}> {
+    if(!file) return Promise.resolve({})
     const features = await getQmkFile(file);
     return Object.fromEntries(features.map((r) => r.split("=")));
   }
