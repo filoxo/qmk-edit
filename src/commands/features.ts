@@ -1,5 +1,5 @@
 import { Command } from "@oclif/command";
-import { getPaths, getQmkFile } from "../utils";
+import { getPaths, getQmkFile } from "../qmkFileUtils";
 import prompt from "../prompt";
 import * as pickBy from 'lodash.pickby';
 
