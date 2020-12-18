@@ -86,18 +86,4 @@ export default class Features extends Command {
     const features = await getQmkFile(file);
     return Object.fromEntries(features.map((r) => r.split("=")));
   }
-
-  createSupportedFeaturesPrompts(features) {
-    const prompts = Object.entries(SUPPORTED_FEATURES).map(
-      ([featureName, choices]) => ({
-        type: "list",
-        message: `Edit ${featureName}`,
-        name: featureName,
-        default: features[featureName],
-        choices,
-        when: (answers) => answers.feature === featureName,
-      })
-    );
-    return prompts;
-  }
 }
