@@ -5,7 +5,12 @@ export default class Config extends Command {
 
   static examples = [`$ qmk-edit config [KEYBOARD_NAME/KEYMAP_NAME]`];
 
-  static args = [{ name: "file" }];
+  static args = [
+    {
+      name: "keyboard",
+      required: true,
+    },
+  ];
 
   async run() {
     const { args, flags } = this.parse(Config);

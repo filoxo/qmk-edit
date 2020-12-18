@@ -47,7 +47,7 @@ export default class Features extends Command {
   static args = [
     {
       name: "keyboard",
-      required: false,
+      required: true,
     },
   ];
 
